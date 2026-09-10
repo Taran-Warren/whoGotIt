@@ -5,9 +5,9 @@ from model import encode_image,resize_image
 import torch
 connection = sqlite3.connect("objects.db")
 cursor = connection.cursor()
-cursor.execute("""create table if not exists objects(id integer primary key autoincrement,user_id text, label text,embedding blob,thumbnail_path text,gifter_name text)""")
+cursor.execute("""create table if not exists objects(id integer primary key autoincrement,user_id text, label text,embedding blob,thumbnail_path text UNIQUE,gifter_name text)""")
 #cursor.execute(""" insert into objects(user_id,label,embedding,thumbnail_path,gifter_name)values(?,?,?,?,?)""",(123,"lab",424553535,"imagge","tom"))
-#connection.commit()
+connection.commit()
 
 
 def get_all_objects():
@@ -22,7 +22,7 @@ def get_all_objects():
 
 def add_object(user_id,label,embedding,thumbnail_path,gifter_name):
     embedding_bytes = embedding.cpu().numpy().tobytes()
-    cursor.execute("""insert into objects(user_id,label,embedding,thumbnail_path,gifter_name)values(?,?,?,?,?)""",(user_id,label,embedding_bytes,thumbnail_path,gifter_name))
+    cursor.execute("""insert or ignore into objects(user_id,label,embedding,thumbnail_path,gifter_name)values(?,?,?,?,?)""",(user_id,label,embedding_bytes,thumbnail_path,gifter_name))
     connection.commit() 
 
 
